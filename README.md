@@ -3,6 +3,7 @@
 [![Acceptance Tests](https://github.com/mongodb/terraform-provider-mongodbatlas/actions/workflows/acceptance-tests.yml/badge.svg)](https://github.com/mongodb/terraform-provider-mongodbatlas/actions/workflows/acceptance-tests.yml)
 
 
+
 This is the repository for the Terraform MongoDB Atlas Provider, which allows one to use Terraform with MongoDB's Database as a Service offering, Atlas.
 Learn more about Atlas at  [https://www.mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas)
 
