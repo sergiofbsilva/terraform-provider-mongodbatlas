@@ -97,7 +97,7 @@ jobs:
           webhook-type: incoming-webhook
           payload: |
             {
-              "text": "(please ignore) testing successful upgrade of slack-github-action version",
+              "text": "(please ignore) testing successful upgrade of slack-github-action version using variable replacement: ${{github.run_id}}",
               "blocks": [
                 {
                   "type": "section",
