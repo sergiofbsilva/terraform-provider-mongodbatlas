@@ -41,51 +41,51 @@ concurrency:
   cancel-in-progress: false
    
 jobs:
-  variables:
-    env:
-      schedule_terraform_matrix: '["1.9.x"]'
-      schedule_provider_matrix: '[""]' # "" for latest version    
-    runs-on: ubuntu-latest
-    outputs:
-      terraform_matrix: ${{ inputs.terraform_matrix || env.schedule_terraform_matrix }}
-      provider_matrix: ${{ inputs.provider_matrix || env.schedule_provider_matrix }}
-      day: ${{ steps.set_day.outputs.DAY }}
-    steps:
-      - name: set day
-        id: set_day
-        run: |
-          echo "DAY=$(date +'%a')"
-          echo "DAY=$(date +'%a')" >> "$GITHUB_OUTPUT"
-  clean-before:
-    secrets: inherit
-    uses: ./.github/workflows/cleanup-test-env.yml
+  # variables:
+  #   env:
+  #     schedule_terraform_matrix: '["1.9.x"]'
+  #     schedule_provider_matrix: '[""]' # "" for latest version    
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     terraform_matrix: ${{ inputs.terraform_matrix || env.schedule_terraform_matrix }}
+  #     provider_matrix: ${{ inputs.provider_matrix || env.schedule_provider_matrix }}
+  #     day: ${{ steps.set_day.outputs.DAY }}
+  #   steps:
+  #     - name: set day
+  #       id: set_day
+  #       run: |
+  #         echo "DAY=$(date +'%a')"
+  #         echo "DAY=$(date +'%a')" >> "$GITHUB_OUTPUT"
+  # clean-before:
+  #   secrets: inherit
+  #   uses: ./.github/workflows/cleanup-test-env.yml
 
-  tests:
-    needs: [clean-before, variables]
-    if: ${{ !cancelled() }}
-    strategy:
-      max-parallel: 1
-      fail-fast: false
-      matrix:
-        terraform_version: ${{ fromJSON(needs.variables.outputs.terraform_matrix) }}
-        provider_version: ${{ fromJSON(needs.variables.outputs.provider_matrix) }}
-    name: tests-${{ matrix.terraform_version || 'latest' }}-${{ matrix.provider_version || 'latest' }}
-    secrets: inherit
-    uses: ./.github/workflows/acceptance-tests.yml
-    with:
-      terraform_version: ${{ matrix.terraform_version }}
-      provider_version: ${{ matrix.provider_version }}
-      atlas_cloud_env: ${{ inputs.atlas_cloud_env || needs.variables.outputs.day == 'Sun' && 'qa' }}
+  # tests:
+  #   needs: [clean-before, variables]
+  #   if: ${{ !cancelled() }}
+  #   strategy:
+  #     max-parallel: 1
+  #     fail-fast: false
+  #     matrix:
+  #       terraform_version: ${{ fromJSON(needs.variables.outputs.terraform_matrix) }}
+  #       provider_version: ${{ fromJSON(needs.variables.outputs.provider_matrix) }}
+  #   name: tests-${{ matrix.terraform_version || 'latest' }}-${{ matrix.provider_version || 'latest' }}
+  #   secrets: inherit
+  #   uses: ./.github/workflows/acceptance-tests.yml
+  #   with:
+  #     terraform_version: ${{ matrix.terraform_version }}
+  #     provider_version: ${{ matrix.provider_version }}
+  #     atlas_cloud_env: ${{ inputs.atlas_cloud_env || needs.variables.outputs.day == 'Sun' && 'qa' }}
 
-  clean-after:
-    needs: tests
-    if: ${{ !cancelled() }}
-    secrets: inherit
-    uses: ./.github/workflows/cleanup-test-env.yml
+  # clean-after:
+  #   needs: tests
+  #   if: ${{ !cancelled() }}
+  #   secrets: inherit
+  #   uses: ./.github/workflows/cleanup-test-env.yml
   
   slack-notification:
-    needs: [tests, clean-after]
-    if: ${{ !cancelled() && needs.tests.result == 'failure' && !contains(github.event.inputs.send_notification, 'false') }}
+    # needs: [tests, clean-after]
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     permissions: {}
     steps:
@@ -97,27 +97,14 @@ jobs:
           webhook-type: incoming-webhook
           payload: |
             {
-              "text": ":red_circle: Test Suite failed (reminder to log failures)",
+              "text": "(please ignore) testing successful upgrade of slack-github-action version",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Test Suite failed (reminder to log failures)* ${{ secrets.SLACK_ONCALL_TAG }}"
+                    "text": "(please ignore) testing successful upgrade of slack-github-action version"
                   }
-                },
-                {
-                  "type": "actions",
-                  "elements": [
-                    {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "text": ":github: Failed action"
-                        },
-                        "url": "${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}"
-                    }
-                ]
                 }
               ]
             }
